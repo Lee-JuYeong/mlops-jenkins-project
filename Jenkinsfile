@@ -1,4 +1,9 @@
 pipeline {
+	agent any
+	parameters {
+		choice(name: 'VERSION', choices: ['1.1.0','1.2.0','1.3.0'], description: '')
+		booleanParam(name: 'executeTests', defaultValue: true, description: '')
+	}
 	stages {
 		stage("init") {
 			steps {
@@ -29,7 +34,7 @@ pipeline {
 				}
 			}
 		}
-				stage("Tag and Push") {
+		stage("Tag and Push") {
 			steps {
 				withCredentials([[$class: 'UsernamePasswordMultiBinding',
 				credentialsId: 'docker-hub', 
@@ -37,7 +42,7 @@ pipeline {
 				passwordVariable: 'DOCKER_USER_PASSWORD'
 				]]) {
 					// 태그 붙이기. 태그를 붙일 때는 jenkins-pipeline_web:latest 태그를 붙여준다.
-					sh "docker tag jenkins-pipeline-web:latest ${DOCKER_USER_ID}/jenkins-app:${BUILD_NUMBER}"
+					sh "docker tag jenkins-pipeline_web:latest ${DOCKER_USER_ID}/jenkins-app:${BUILD_NUMBER}"
 					
 					// 로그인
 					sh "docker login -u ${DOCKER_USER_ID} -p ${DOCKER_USER_PASSWORD}"
